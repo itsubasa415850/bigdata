@@ -1,6 +1,7 @@
 # encoding=utf8
 # !/usr/bin/env python
 
+import os
 
 import re
 import urllib2
@@ -18,7 +19,7 @@ headers = {
 }
 testee = ''
 final = ''
-dir = r'C:/Users/guopeng02/Desktop/worm/'
+dir = os.path.abspath('.')
 for num in range(2, 10):
     print('现在开始爬第' + str(num) + '页的口碑。')
     # 一，载入网页
@@ -57,13 +58,14 @@ print('分析过程开始。')
 # 四、词频分析
 # 统计出现频率最高的前N个词
 tags = jieba.analyse.extract_tags(testee, 100)
-# print('初筛之后的结果：')
-# print(",".join(tags))
 # 五、停用词筛出
 # 载入停用词列表文件
 print '停用词筛出'
-stopwords = {}.fromkeys([line.rstrip() for line in open(dir + 'stop_words_zh_UTF-8.txt', mode='r')])
-#, encoding='UTF-8'
+#烦人的PY27！读写文件之前先把内容解码！！
+#还是不太熟悉，所以把stopwords先改成空格分隔了。。。
+# stopwords = {}.fromkeys([line.rstrip() for line in open(dir + r'\stop_words_zh_UTF-8.txt', mode='r')])
+stopwords = open(dir + r'\stop_words_zh_UTF-8.txt', mode='r').read().decode('utf8')
+print stopwords
 for tag in tags:
     if tag not in stopwords:
         final += ' ' + tag
@@ -72,13 +74,13 @@ for tag in tags:
 # file = open(dir + 'words200.txt', mode='w')#, encoding='UTF-8'
 # file.write(" ".join(final).encode('utf8'))
 #七、生成图片
-back_coloring = imread.imread("C:/Users/guopeng02/Desktop/worm/bg.jpg")
-wc = WordCloud(font_path= r'C:/Users/guopeng02/Desktop/worm/msyh.ttc',
+back_coloring = imread.imread(dir + r"\bg.jpg")
+wc = WordCloud(font_path= dir + r'\msyh.ttc',
                 background_color="white", #背景颜色
-                max_words=2000,# 词云显示的最大词数
+                max_words=100,# 词云显示的最大词数
                 mask=back_coloring,#设置背景图片
                 max_font_size=100, #字体最大值
-                random_state=42,
+                random_state=None,
                 )
 print '分析过程结束。'
 #生成字体图片
@@ -91,5 +93,5 @@ plt.imshow(wc)
 plt.axis("off")
 plt.show()
 #将图片写入文件
-wc.to_file('C:/Users/guopeng02/Desktop/worm/1.png')
+wc.to_file(dir + r'\1.png')
 print '全部完成。'
